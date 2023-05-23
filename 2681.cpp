@@ -3,7 +3,6 @@
 using namespace std;
 using ll = long long;
 using pii = pair<int, int>;
-#include<chrono>
 const int inf = (1e9) + 7;
 #define pb push_back
 #define pf push_front
@@ -59,3 +58,7 @@ public:
         return ans(temp);
     }
 };
+
+int main(){
+    cout<<"Hello world"<<endl;
+}

@@ -9,26 +9,57 @@ const int inf = (1e9) + 7;
 
 string ans(vector<int>& nums){
     int n = nums.size();
-    vector<int> suff(n);
 
-    suff[n-1]=nums[n-1];
-    for(int i=n-2;i>=0;i--)
-        suff[i] = nums[i]+suff[i+1];
+    vector<int> dp(n,-inf);
+    vector<int> prefsum(n,0);
+    prefsum[0] = nums[0];
+
+    for(int i=1;i<n;i++)
+        prefsum[i] = prefsum[i-1]+nums[i];
     
-    vector<vector<int>> dp(n,vector<int>(2,0));
-    dp[n-1][0]=nums[0];
-    dp[n-1][1]=nums[0];
+    auto range = [&](int l,int r)->int{
+        if(l==0)
+            return prefsum[r];
+        return prefsum[r]-prefsum[l-1];
+    };
 
-    if(n>=2){
-        dp[n-2][0] = max(nums[n-2],nums[n-2]+nums[n-1]);
-        dp[n-2][1]=dp[n-2][0];
-    }
+    auto dfs =[&](int pos,auto&& dfs)->int{
+        if(dp[pos]!=-inf)
+            return dp[pos];
+        
+        if(pos==n-1){
+            dp[pos]=nums[n-1];
+            return dp[pos];
+        }
 
-    if(n>=3){
-        dp[n-3][0] = max({suff[n-3],suff[n-3]-suff[n-1],nums[n-3]+suff[n-2]-dp[n-2][0]});
-        dp[n-3][1]=dp[n-3][0];
-    }
+        if(pos+1<n)
+            dp[pos] = max(dp[pos],nums[pos]+range(pos+1,n-1)-dfs(pos+1,dfs));
+        
+        if(pos+2<n)
+            dp[pos] = max(dp[pos],nums[pos]+nums[pos+1]+range(pos+2,n-1)-dfs(pos+2,dfs));
+        
+        if(pos+3<n)
+            dp[pos] = max(dp[pos],nums[pos]+nums[pos+1]+nums[pos+2]+range(pos+3,n-1)-dfs(pos+3,dfs));
 
-    string ans = 'Bob';
-    if(n<=3&&dp[n-1][0]>=)
+        if(pos+1==n-1)
+            dp[pos] = max(dp[pos],nums[pos]+nums[pos+1]);
+        if(pos+2==n-1)
+            dp[pos] = max(dp[pos],nums[pos]+nums[pos+1]+nums[pos+2]);
+
+        return dp[pos];
+    };
+
+    dfs(0,dfs);
+    if(dp[0]>range(0,n-1)-dp[0])
+        return "Alice";
+    else if(dp[0]<range(0,n-1)-dp[0])
+        return "Bob";
+    return "Tie";
 }
+
+class Solution {
+public:
+    string stoneGameIII(vector<int>& stoneValue) {
+        return ans(stoneValue);
+    }
+};
