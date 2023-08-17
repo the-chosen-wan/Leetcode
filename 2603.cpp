@@ -7,3 +7,7 @@ const int inf = (1e9) + 7;
 #define pb push_back
 #define pf push_front
 #define mp make_pair
+
+int ans(vector<int>& coins, vector<vector<int>>& edges) {
+    
+}

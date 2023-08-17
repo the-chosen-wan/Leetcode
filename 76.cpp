@@ -6,51 +6,68 @@ using pii = pair<int, int>;
 const int inf = 1e9;
 #define pb push_back
 #define mp make_pair
-#define N 70
+#define N 60
 
-bool check(vector<int> &n1, vector<int> &n2)
-{
-    for (int i = 0; i < N; i++)
-        if (n1[i] != n2[i])
-            return false;
-    return true;
-}
+string ans(string s,string t){
+    int n = s.length();
+    int m = t.length();
 
-string ans(string s, string t)
-{
-    vector<int> tc(N, 0);
-    vector<int> sc(N, 0);
+    vector<int> cnt(N,0);
 
-    int tn = t.size();
-    int sn = s.size();
-    for (int i = 0; i < tn; i++)
-        tc[t[i] - 'A']++;
-
+    for(int i=0;i<m;i++)
+        cnt[t[i]-'A']++;
+    
     int low = 0;
-    int maxlen = inf;
-    string ans = "";
-    for (int i = 0; i < sn; i++)
-    {
-        sc[s[i] - 'A']++;
-        while (low <= i && !check(sc, tc))
-        {
-            sc[s[low] - 'A']--;
-            low++;
-        }
+    int high = 0;
 
-        if (low > i)
-        {
-            sc[s[i] - 'A']++;
-            low = i;
-            continue;
-        }
-        if (i - low + 1 < maxlen)
-        {
-            maxlen = i - low + 1;
-            ans = s.substr(low, i - low + 1);
+    pii index = mp(0,inf);
+
+    vector<int> condition(N,true);
+    int numcond = 0;
+    for(int i=0;i<N;i++){
+        if(cnt[i]!=0){
+            condition[i] = false;
+            numcond++;
         }
     }
-    return ans;
+
+    vector<int> temp(N,0);
+    while(high<n){
+        while(high<n&&numcond!=0){
+            int ind = s[high]-'A';
+            temp[ind]++;
+            if(temp[ind]>=cnt[ind]&&!condition[ind]){
+                condition[ind]=true;
+                numcond--;
+            }
+            high++;
+        }
+
+        if(numcond!=0&&high==n)
+            break;
+        
+
+        while(low<n&&numcond==0){
+            int ind = s[low]-'A';
+
+            temp[ind]--;
+
+            if(temp[ind]<cnt[ind]&&condition[ind]){
+                condition[ind]=false;
+                numcond++;
+            }
+        if(high-low-1<(index.second-index.first)){
+            index.first = low;
+            index.second = high-1;
+        }
+            low++;
+        }
+    }
+
+    if(index.second==inf)
+        return "";
+    
+    return s.substr(index.first,index.second-index.first+1);
 }
 
 class Solution

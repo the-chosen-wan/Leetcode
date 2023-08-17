@@ -67,12 +67,5 @@ int ans(vector<vector<int>>& grid,int k){
         }
     }
 
-    vector<vector<int>> dist(k,vector<int>(k,inf));
-    for(int i=0;i<n;i++)
-        for(int j=0;j<m;j++)
-            mindist(i*m+j,n,m,adj,dist);
-        
-    int mini = dist[0][k-1];
-
     
 }

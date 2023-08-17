@@ -4,66 +4,64 @@ using namespace std;
 using ll = long long;
 using pii = pair<int, int>;
 using namespace std;
-const int inf = 1e9;
+const int inf = 1e8;
 #define pb push_back
 #define mp make_pair
 
-int ans(vector<int> &nums, int k)
-{
+int ans(vector<int> &nums, int k){
     int n = nums.size();
-    int bsize = n / k;
-    int dp[(1 << n)][k][bsize + 1];
-    memset(dp, -1, sizeof(dp));
-    vector<set<int>> contains(k);
-    bool check = false;
+    vector<vector<int>> dp(k+1,vector<int>(1<<n,inf));
 
-    auto dfs = [&](int mask, int box, int size, auto &&dfs) -> int
-    {
-        if (mask == 0)
-        {
-            check = true;
+    int localmax = -inf;
+    int localmin = inf;
+
+    auto dfs = [&](int i,int mask,auto&& dfs)->int{
+        if(i==0&&mask!=0){
+            return 2*inf;
+        }
+
+        if(i==0&&mask==0){
+            dp[i][mask]=0;
             return 0;
         }
-        if (box > k - 1)
-        {
-            return inf;
-        }
-        if (dp[mask][box][size] != -1)
-            return dp[mask][box][size];
-        if (size == bsize)
-        {
-            int ret = inf;
-            int small = *contains[box].begin();
-            int large = *contains[box].rbegin();
-            ret = large - small + dfs(mask, box + 1, 0, dfs);
-            dp[mask][box][size] = ret;
-            return ret;
+
+        if(dp[i][mask]!=inf)
+            return dp[i][mask];
+
+        int state1 = localmax;
+        int state2 = localmin;
+
+        if(localmax!=-inf&&localmin!=inf){
+            int val = localmax-localmin;
+            localmax = -inf;
+            localmin = inf;
+            dp[i][mask] = min(dp[i][mask],val+dfs(i-1,mask,dfs));
         }
 
-        int ret = inf;
-        for (int i = 0; i < n; i++)
-        {
-            if (((mask & (1 << i)) != 0) && (contains[box].find(nums[i]) == contains[box].end()))
-            {
-                contains[box].insert(nums[i]);
-                ret = min(ret, dfs(mask ^ (1 << i), box, size + 1, dfs));
-                contains[box].erase(nums[i]);
+        localmax = state1;
+        localmin = state2;
+
+        for(int j=0;j<n;j++){
+            if(mask&(1<<j)){
+
+                localmax = max(localmax,nums[j]);
+                localmin = min(localmin,nums[j]);
+
+                dp[i][mask] = min(dp[i][mask],dfs(i,mask^(1<<j),dfs));
+
+                localmax = state1;
+                localmin = state2;
             }
         }
-        dp[mask][box][size] = ret;
-        return ret;
+        return dp[i][mask];
     };
-    int val = dfs((1 << n) - 1, 0, 0, dfs);
-    if (!check)
-        return -1;
-    return val;
+
+    return dfs(k,(1<<n)-1,dfs);
 }
 
-class Solution
-{
+class Solution {
 public:
-    int minimumIncompatibility(vector<int> &nums, int k)
-    {
-        return ans(nums, k);
+    int minimumIncompatibility(vector<int>& nums, int k) {
+        return ans(nums,k);
     }
 };

@@ -8,3 +8,8 @@ const int inf = 1e9;
 #define mp make_pair
 #define N (1e5)
 
+int ans(string s){
+    int n = s.length();
+
+    
+}
